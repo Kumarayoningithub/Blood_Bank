@@ -496,7 +496,7 @@ const Form = ({ formType, submitBtn, formTitle }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  /*const handleSubmit = async (e) => {
     e.preventDefault();
     if (formType === "login") {
       const res = await dispatch(
@@ -522,7 +522,43 @@ const Form = ({ formType, submitBtn, formTitle }) => {
         navigate("/login");
       }
     }
-  };
+  };*/
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (formType === "login") {
+    const res = await dispatch(
+      userLogin({
+        role: formData.role,
+        email: formData.email,
+        password: formData.password,
+      })
+    );
+    if (res?.payload?.success) {
+      navigate("/homepage");
+    }
+  } else if (formType === "register") {
+    // Age restriction only for donors
+    if (
+      formData.role === "donar" &&
+      ((formData.gender === "Male" && formData.age < 18) ||
+        (formData.gender === "Female" && formData.age < 21))
+    ) {
+      alert("Age must be at least 18 for Male and 21 for Female.");
+      return;
+    }
+
+    const res = await dispatch(userRegister(formData));
+    if (res?.payload?.success) {
+      navigate("/login");
+    }
+  }
+};
+
+
+
+
+
+
 
   return (
     <form onSubmit={handleSubmit}>
